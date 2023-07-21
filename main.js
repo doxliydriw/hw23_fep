@@ -135,7 +135,7 @@ const CITY_ERROR = 'Please check your city of living';
 const ADDRESS_ERROR = 'Please input your address';
 const COMMENTS_ERROR = 'Please input your comments';
 
-window.onload = () => {
+window.onload = (load) => {
     const ul = document.createElement("ul");
     data.forEach(element => {
         let li = document.createElement("li");
@@ -155,6 +155,7 @@ orderBtn.addEventListener("click", (e) => {
         orderBtn.style.display = 'none';
         ordersArray = JSON.parse(localStorage.getItem('orders'))
         orderList();
+        return orderTable;
     } else {
         alert('No orders stored');
     }
@@ -361,19 +362,23 @@ function datatable() {
 
 ///Order list archive generation func///
 function orderList() {
-    table = document.createElement('table');
-    table.setAttribute('id', 'orderTable');
-    body.appendChild(table);
+    let listTable = document.createElement('table');
+    listTable.setAttribute('id', 'orderTable');
+    body.appendChild(listTable);
     thead = document.createElement('th');
     thead.setAttribute('colspan', 4);
     thead.textContent = 'Order list';
-    table.appendChild(thead);
+    listTable.appendChild(thead);
     for (let i = 0; i < ordersArray.length; i++) {
         // let obj = Object.fromEntries(ordersArray[i]);
         const row = document.createElement('tr');
         const cellOne = document.createElement('td');
         cellOne.textContent = i + 1;
         cellOne.setAttribute('id', "list" + i);
+        cellOne.addEventListener("click", (elem) => {
+            console.log(elem.target.id);
+            showOrder(ordersArray[i]);
+        })
         const cellTwo = document.createElement('td');
         cellTwo.textContent = ordersArray[i][9][1];
         const cellThree = document.createElement('td');
@@ -382,20 +387,63 @@ function orderList() {
         let delBtn = document.createElement('button')
         delBtn.setAttribute('id', "order_" + i);
         delBtn.textContent = 'delete order';
-        delBtn.Btn.addEventListener("click", deleteOrder(i));
+        delBtn.addEventListener("click", (elem) => {
+            console.log(elem.target.id)
+            let i = (elem.target.id).replace('order_', '')
+            ordersArray.splice(Number(i), 1);
+            // console.log(ordersArray);
+            localStorage.setItem('orders', JSON.stringify(ordersArray));
+            body.innerHTML = '';
+            if (ordersArray.length < 1) {
+                localStorage.clear();
+            }
+            orderList();
+        })
         cellFour.appendChild(delBtn);
         row.appendChild(cellOne);
         row.appendChild(cellTwo);
         row.appendChild(cellThree);
         row.appendChild(cellFour);
+        listTable.appendChild(row);
+    }
+    return orderTable = document.getElementById('orderTable')
+}
+
+/////// function for the CALL ORDER FROM ARCHIVE////////
+function showOrder(elem) {
+    body.innerHTML = '';
+    table = document.createElement('table');
+    table.setAttribute('id', 'datatable');
+    body.appendChild(table);
+    thead = document.createElement('th');
+    thead.setAttribute('colspan', 2);
+    thead.textContent = 'Your order details';
+    table.appendChild(thead);
+    for (i of elem) {
+        const row = document.createElement('tr');
+        const cellOne = document.createElement('td');
+        cellOne.textContent = i[0];
+        const cellTwo = document.createElement('td');
+        cellTwo.textContent = i[1];
+        row.appendChild(cellOne);
+        row.appendChild(cellTwo);
         table.appendChild(row);
     }
 }
 
-
-function deleteOrder(OrderToDelete) {
-
+// /////// EventListener for the DELETE ORDER////////
+function deleteOrder(elem) {
+    let i = (elem.target.id).replace('order_', '')
+    ordersArray.splice(Number(i), 1);
+    // console.log(ordersArray);
+    localStorage.setItem('orders', JSON.stringify(ordersArray));
+    body.innerHTML = '';
+    if (ordersArray.length < 1) {
+        localStorage.clear();
+    }
+    orderList();
 }
+
 
 //////// EventListener for the form.////////
 myform.addEventListener('submit', (event) => {
