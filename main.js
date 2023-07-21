@@ -218,8 +218,6 @@ buy.addEventListener("click", (e) => {
     myform.style.display = 'grid';
 })
 
-//////// EventListener for the DELETE ORDER.////////
-
 
 function ShowError(elem, msg) {
     console.log(elem);
